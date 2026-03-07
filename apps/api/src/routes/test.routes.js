@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const { z } = require("zod");
-const { nanoid } = require("nanoid");
+const { randomBytes } = require("crypto");
 const Test = require("../models/Test");
 const Attempt = require("../models/Attempt");
 const { authRequired, authOptional } = require("../middleware/auth");
@@ -29,6 +29,12 @@ function buildQuestionPapers(poolQuestions, totalQuestionsToShow, questionPaperC
 
 function setPublicCache(res, seconds) {
   res.set("Cache-Control", `public, max-age=${seconds}, stale-while-revalidate=${seconds * 2}`);
+}
+
+function createSlug(length = 10) {
+  return randomBytes(Math.ceil(length * 0.75))
+    .toString("base64url")
+    .slice(0, length);
 }
 
 /**
@@ -73,7 +79,7 @@ router.post("/", authOptional, async (req, res, next) => {
       payload.questionPaperCount
     );
 
-    const slug = nanoid(10);
+    const slug = createSlug(10);
     const test = await Test.create({
       ownerId: req.user?.userId || null,
       slug,

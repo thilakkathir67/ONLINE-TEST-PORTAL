@@ -1,0 +1,32 @@
+{
+  "name": "otp-web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "clean:next": "node -e \"const fs=require('fs');fs.rmSync('.next',{recursive:true,force:true});fs.rmSync('node_modules/.cache/next',{recursive:true,force:true});\"",
+    "dev": "node scripts/dev-fast.js",
+    "dev:turbo": "node scripts/dev-fast.js --turbo",
+    "dev:clean": "node scripts/dev-fast.js --clean",
+    "dev:prewarm": "node scripts/dev-fast.js --prewarm",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.453.0",
+    "next": "15.5.10",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "25.0.10",
+    "@types/react": "18.3.11",
+    "autoprefixer": "^10.4.20",
+    "eslint": "9.39.1",
+    "eslint-config-next": "15.5.10",
+    "postcss": "^8.4.41",
+    "tailwindcss": "^3.4.10",
+    "typescript": "^5.5.4"
+  }
+}

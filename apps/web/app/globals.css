@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  @apply bg-navy-950 text-white antialiased;
+  position: relative;
+}
+
+/* 🔥 FIXED BACKGROUND LAYER (NO REPEAT, NO BANDING) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+
+  background:
+    radial-gradient(800px 400px at 20% 20%, rgba(24,225,197,0.20), transparent 60%),
+    radial-gradient(700px 350px at 80% 30%, rgba(56,189,248,0.14), transparent 55%),
+    linear-gradient(135deg, #040b1a 0%, #07142e 45%, #0b2147 100%);
+
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* KEEP CLASS (NO BACKGROUND HERE) */
+.bg-hero {
+  position: relative;
+}
+
+.card-glass {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+}
+.no-resize {
+  resize: none;
+  overflow: hidden;
+  line-height: 1.5;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", monospace;
+}
+
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.no-spinner[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}

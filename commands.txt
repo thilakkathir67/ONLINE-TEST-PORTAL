@@ -1,0 +1,26 @@
+﻿Project: online-test-portal (3)
+Root:
+cd "c:\Users\THILAK\Downloads\online-test-portal (3)"
+
+DEV MODE (2 terminals)
+Terminal 1 (API):
+cd "c:\Users\THILAK\Downloads\online-test-portal (3)\apps\api"
+npm run dev
+
+Terminal 2 (Web):
+cd "c:\Users\THILAK\Downloads\online-test-portal (3)\apps\web"
+npm run dev
+
+PRODUCTION MODE (2 terminals)
+Terminal 1 (API):
+cd "c:\Users\THILAK\Downloads\online-test-portal (3)\apps\api"
+npm start
+
+Terminal 2 (Web):
+cd "c:\Users\THILAK\Downloads\online-test-portal (3)\apps\web"
+npm run build
+npm run start
+
+Checks:
+Web: http://localhost:3000
+API health: http://localhost:5000/health

@@ -3,7 +3,7 @@ const { z } = require("zod");
 const { randomBytes } = require("crypto");
 const Test = require("../models/Test");
 const Attempt = require("../models/Attempt");
-const { authRequired, authOptional } = require("../middleware/auth");
+const { authRequired } = require("../middleware/auth");
 
 function fisherYates(list) {
   const copy = [...list];
@@ -41,7 +41,7 @@ function createSlug(length = 10) {
  * POST /api/tests
  * Create test with 50% extra questions rule + pre-generated papers.
  */
-router.post("/", authOptional, async (req, res, next) => {
+router.post("/", authRequired, async (req, res, next) => {
   try {
     const schema = z.object({
       name: z.string().min(2),
@@ -81,7 +81,7 @@ router.post("/", authOptional, async (req, res, next) => {
 
     const slug = createSlug(10);
     const test = await Test.create({
-      ownerId: req.user?.userId || null,
+      ownerId: req.user.userId,
       slug,
       name: payload.name,
       description: payload.description || "",

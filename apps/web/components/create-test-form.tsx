@@ -119,10 +119,12 @@ export function CreateTestForm() {
     const totalTemplates = Math.ceil(aiCount * 1.5);
     setAiLoading(true);
     try {
+      const token = getToken();
       const data = await api<{ ok: true; questions: Question[] }>(
         "/api/ai/generate",
         {
           method: "POST",
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
           body: JSON.stringify({
             count: totalTemplates,
             difficulty: aiDifficulty,

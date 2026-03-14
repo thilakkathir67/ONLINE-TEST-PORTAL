@@ -7,6 +7,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const { connectDb } = require("./utils/db");
+const { authRequired } = require("./middleware/auth");
 const { errorHandler } = require("./middleware/errorHandler");
 
 const authRoutes = require("./routes/auth.routes");
@@ -47,7 +48,7 @@ app.get("/health", (_, res) =>
 app.use("/api/auth", authRoutes);
 app.use("/api/tests", testRoutes);
 app.use("/api/attempts", attemptRoutes);
-app.use("/api/ai", aiRoutes);
+app.use("/api/ai", authRequired, aiRoutes);
 
 app.use(errorHandler);
 

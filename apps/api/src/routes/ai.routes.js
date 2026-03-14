@@ -2,7 +2,7 @@ const router = require("express").Router();
 const { z } = require("zod");
 
 const inputSchema = z.object({
-  count: z.number().int().min(1).max(50),
+  count: z.number().int().min(1).max(75),
   difficulty: z.enum(["easy", "medium", "hard"]),
   topic: z.string().min(2),
   questionType: z.enum(["MCQ"]),

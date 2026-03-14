@@ -116,6 +116,7 @@ export function CreateTestForm() {
 }
 
   async function generateAI() {
+    const totalTemplates = Math.ceil(aiCount * 1.5);
     setAiLoading(true);
     try {
       const data = await api<{ ok: true; questions: Question[] }>(
@@ -123,7 +124,7 @@ export function CreateTestForm() {
         {
           method: "POST",
           body: JSON.stringify({
-            count: aiCount,
+            count: totalTemplates,
             difficulty: aiDifficulty,
             topic: aiTopic,
             questionType: aiType,
@@ -477,6 +478,9 @@ return (
                 <Label>Questions</Label>
                 <div className="mt-2">
                   <Input type="number" min={1} max={50} value={aiCount} onChange={(e) => setAiCount(Number(e.target.value))} />
+                </div>
+                <div className="mt-1 text-xs text-white/60">
+                  Generates {Math.ceil(aiCount * 1.5)} questions (includes 50% extra for randomization)
                 </div>
               </div>
               <div>

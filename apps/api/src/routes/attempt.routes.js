@@ -2,6 +2,7 @@ const router = require("express").Router();
 const { z } = require("zod");
 const Test = require("../models/Test");
 const Attempt = require("../models/Attempt");
+const TestAttemptCounter = require("../models/TestAttemptCounter");
 
 function fisherYates(list) {
   const copy = [...list];
@@ -14,7 +15,7 @@ function fisherYates(list) {
 
 /**
  * START TEST
- * Assign a random pre-generated question paper and store what was served.
+ * Assign a fair (round-robin) pre-generated question paper and store what was served.
  */
 router.post("/:slug/start", async (req, res, next) => {
   try {
@@ -37,7 +38,34 @@ router.post("/:slug/start", async (req, res, next) => {
     let served = [];
 
     if (Array.isArray(test.questionPapers) && test.questionPapers.length > 0) {
-      selectedPaperIndex = Math.floor(Math.random() * test.questionPapers.length);
+      // Fair allocation: round-robin across papers using an atomic DB counter.
+      // This prevents skew (e.g., 8/10 getting the same paper) and is safe under concurrency.
+      let counter;
+      try {
+        counter = await TestAttemptCounter.findOneAndUpdate(
+          { testId: test._id },
+          {
+            $inc: { next: 1 },
+            $setOnInsert: { offset: Math.floor(Math.random() * 1_000_000_000) },
+          },
+          { new: true, upsert: true }
+        ).lean();
+      } catch (err) {
+        // Rare race: simultaneous upserts can hit E11000 duplicate key. Retry once after doc exists.
+        if (err && err.code === 11000) {
+          counter = await TestAttemptCounter.findOneAndUpdate(
+            { testId: test._id },
+            { $inc: { next: 1 } },
+            { new: true }
+          ).lean();
+        } else {
+          throw err;
+        }
+      }
+
+      const allocationNumber = Math.max(0, (counter?.next ?? 1) - 1);
+      const offset = counter?.offset ?? 0;
+      selectedPaperIndex = (allocationNumber + offset) % test.questionPapers.length;
       const selectedPaper = test.questionPapers[selectedPaperIndex];
       selectedPaperType = selectedPaper?.paperType || "A";
       served = selectedPaper?.questions || [];

@@ -365,21 +365,28 @@ return (
                   {q.type === "MCQ" ? (
                     <>
                       <div className="sm:col-span-2">
-                        <Label>Options</Label>
-                        <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                          {(q.options || []).map((opt, oi) => (
-                            <Input
+                       <Label>Options</Label>
+                         <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                           {(q.options || []).map((opt, oi) => (
+                            <Textarea
                               key={oi}
+                              className="no-resize"
+                              rows={1}
                               value={opt}
                               onChange={(e) => {
                                 const next = [...(q.options || [])];
                                 next[oi] = e.target.value;
                                 updateQuestion(idx, { options: next });
                               }}
+                              onInput={(e) => {
+                                const el = e.currentTarget;
+                                el.style.height = "auto";
+                                el.style.height = el.scrollHeight + "px";
+                              }}
                             />
                           ))}
-                        </div>
-                      </div>
+                         </div>
+                       </div>
 
                       <div className="sm:col-span-2">
                         <Label>Correct answer</Label>

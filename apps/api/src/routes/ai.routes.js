@@ -31,13 +31,27 @@ function buildPrompt({ count, difficulty, topic }) {
     `Topic: ${topic}`,
     `Difficulty: ${difficulty}`,
     "Return ONLY valid JSON in this shape:",
-    '{"questions":[{"type":"MCQ","prompt":"...","options":["A","B","C","D"],"correctIndex":0,"marks":1,"explanation":"..."}]}',
+    '{"questions":[{"type":"MCQ","prompt":"...","options":["Option text 1","Option text 2","Option text 3","Option text 4"],"correctIndex":0,"marks":1,"explanation":"..."}]}',
     "Rules:",
     "- Exactly 4 options per question",
+    "- Options must be meaningful answer text (do NOT return just \"A\",\"B\",\"C\",\"D\" as option values)",
     "- correctIndex must be 0 to 3",
     "- marks must be 1",
     "- No markdown, no code fences, no extra keys",
   ].join("\n");
+}
+
+function stripOptionPrefix(text) {
+  if (typeof text !== "string") return "";
+  const trimmed = text.trim();
+  // Common AI formats: "A. foo", "B) bar", "C - baz", etc.
+  return trimmed.replace(/^[A-D]\s*[\)\.\:\-]\s*/i, "").trim();
+}
+
+function isPlaceholderOptions(options) {
+  if (!Array.isArray(options) || options.length < 4) return false;
+  const first4 = options.slice(0, 4).map((o) => String(o).trim());
+  return first4.every((o) => /^[A-D]$/i.test(o) || /^Option\s+[A-D]$/i.test(o));
 }
 
 function extractJson(text) {
@@ -68,8 +82,15 @@ function normalizeQuestions(raw, count) {
       const prompt = typeof q?.prompt === "string" && q.prompt.trim() ? q.prompt.trim() : `Question ${i + 1}`;
 
       const rawOptions = Array.isArray(q?.options)
-        ? q.options.filter((opt) => typeof opt === "string" && opt.trim()).map((opt) => opt.trim())
+        ? q.options
+            .filter((opt) => typeof opt === "string" && opt.trim())
+            .map((opt) => stripOptionPrefix(opt))
+            .filter((opt) => opt)
         : [];
+
+      if (isPlaceholderOptions(q?.options)) {
+        return null;
+      }
 
       const options = rawOptions.slice(0, 4);
       while (options.length < 4) {
@@ -92,10 +113,13 @@ function normalizeQuestions(raw, count) {
         source: "AI",
       };
     })
+    .filter(Boolean)
     .filter((q) => q.prompt);
 
   if (!normalized.length) {
-    throw Object.assign(new Error("AI provider returned invalid questions."), { status: 502 });
+    throw Object.assign(new Error("AI provider returned questions without valid options. Please regenerate."), {
+      status: 502,
+    });
   }
 
   return normalized;

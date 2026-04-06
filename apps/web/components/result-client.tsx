@@ -51,6 +51,27 @@ export function ResultClient({ attemptId }: { attemptId: string }) {
   if (!attempt) return <div className="text-white/60">Result not found.</div>;
 
   const totalMarks = attempt.questions.length;
+  const scorePercentRaw = totalMarks > 0 ? (attempt.score / totalMarks) * 100 : 0;
+  const scorePercent = Math.max(0, Math.min(100, Math.round(scorePercentRaw)));
+
+  const performance =
+    scorePercent <= 33
+      ? {
+          label: "Low performance",
+          detail: "Needs improvement",
+          className: "border-red-500/40 bg-red-500/10 text-red-300",
+        }
+      : scorePercent <= 66
+      ? {
+          label: "Average",
+          detail: "Keep practicing",
+          className: "border-yellow-500/40 bg-yellow-500/10 text-yellow-300",
+        }
+      : {
+          label: "Good",
+          detail: "Great job",
+          className: "border-green-500/40 bg-green-500/10 text-green-300",
+        };
 
   return (
     <Card>
@@ -78,6 +99,15 @@ export function ResultClient({ attemptId }: { attemptId: string }) {
         <div className="mt-1 text-3xl font-semibold text-neon-500">
           {attempt.score}
           <span className="text-white/40 text-lg"> / {totalMarks}</span>
+        </div>
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+          <span
+            className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${performance.className}`}
+          >
+            {performance.label}
+          </span>
+          <span className="text-xs text-white/60">{performance.detail}</span>
+          <span className="text-xs text-white/40">({scorePercent}%)</span>
         </div>
       </div>
 
